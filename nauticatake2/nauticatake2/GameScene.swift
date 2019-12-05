@@ -15,7 +15,8 @@ func make_node(from: Int, size: Double) -> SKSpriteNode {
     let f = String(format: "fishTile_%03d", from)
     let n = SKSpriteNode(imageNamed: f)
     n.size = CGSize(width: size, height: size)
-//    n.physicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: f), size: n.size)
+//    n.physicsBody = SKPhysicsBody(texture: n.texture!, size: n.texture!.size())
+//    n.physicsBody = SKPhysicsBody(rectangleOf: n.size)
     n.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(size))
     return n
 }
@@ -42,7 +43,7 @@ class GameScene: SKScene {
     private var x = 0
     
     override func didMove(to view: SKView) {
-        self.physicsWorld.gravity = CGVector(dx: 0.0, dy: -4.9)
+        self.physicsWorld.gravity = CGVector(dx: 0.1, dy: -4.9)
         
         backgroundColor = UIColor(rgb: 0x40d6cc)
         
@@ -52,16 +53,13 @@ class GameScene: SKScene {
             let sponge = SPONGES.randomElement()!
             for i in sponge {
                 let px = size.width * x / 10
-                let sponge_node = make_node(from: i, size: SIZE / 2)
-                sponge_node.position = CGPoint(x: px + Double.random(in: -10...10) / 100, y: 0.4)
+                let sponge_node = make_node(from: i, size: SIZE)
+                sponge_node.position = CGPoint(x: px + Double.random(in: -10...10) / 100, y: 0.6)
 
-                if let physics = sponge_node.physicsBody {
-                    physics.affectedByGravity = true
-                    physics.allowsRotation = true
-                    physics.isDynamic = true;
-                    physics.linearDamping = 0.75
-                    physics.angularDamping = 0.75
-                }
+                sponge_node.physicsBody!.affectedByGravity = true
+                sponge_node.physicsBody!.allowsRotation = true
+                sponge_node.physicsBody!.isDynamic = false
+                
                 addChild(sponge_node)
             }
         }
@@ -73,30 +71,21 @@ class GameScene: SKScene {
             let first = make_node(from: 1, size: SIZE)
             first.position = CGPoint(x: px, y: 0.15)
             first.zPosition = 1
-            if let physics = first.physicsBody {
-                physics.affectedByGravity = false
-                physics.allowsRotation = true
-                physics.isDynamic = true;
-                physics.linearDamping = 0.75
-                physics.angularDamping = 0.75
-            }
+            
+            first.physicsBody!.affectedByGravity = false
+            first.physicsBody!.allowsRotation = true
+            first.physicsBody!.isDynamic = false
             
             let second = make_node(from: ground[x % ground.count], size: SIZE)
             second.position = CGPoint(x: px, y: 0.3)
             second.zPosition = 1
             
-            if let physics = second.physicsBody {
-                physics.affectedByGravity = false
-                physics.allowsRotation = true
-                physics.isDynamic = true;
-                physics.linearDamping = 0.75
-                physics.angularDamping = 0.75
-            }
+            second.physicsBody!.affectedByGravity = false
+            second.physicsBody!.allowsRotation = true
+            second.physicsBody!.isDynamic = false
             
             groundNodes.append(first)
             groundNodes.append(second)
-            
-            print(second.position)
             
             addChild(first)
             addChild(second)
