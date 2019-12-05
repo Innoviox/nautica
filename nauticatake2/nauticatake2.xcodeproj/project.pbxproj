@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F98C8E742399975100B16D28 /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98C8E732399975100B16D28 /* Math.swift */; };
 		F9990189238ECEEB00D345CB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9990188238ECEEB00D345CB /* AppDelegate.swift */; };
 		F999018D238ECEEB00D345CB /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = F999018C238ECEEB00D345CB /* Actions.sks */; };
 		F999018F238ECEEB00D345CB /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = F999018E238ECEEB00D345CB /* GameScene.swift */; };
@@ -38,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F98C8E732399975100B16D28 /* Math.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Math.swift; sourceTree = "<group>"; };
 		F9990185238ECEEA00D345CB /* nauticatake2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nauticatake2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9990188238ECEEB00D345CB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F999018C238ECEEB00D345CB /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 				F9990197238ECEEE00D345CB /* LaunchScreen.storyboard */,
 				F999019A238ECEEE00D345CB /* Info.plist */,
 				F99901BC238ECF1C00D345CB /* Joystick.swift */,
+				F98C8E732399975100B16D28 /* Math.swift */,
 			);
 			path = nauticatake2;
 			sourceTree = "<group>";
@@ -274,6 +277,7 @@
 				F9990191238ECEEB00D345CB /* GameViewController.swift in Sources */,
 				F99901BF238ECF3B00D345CB /* JoystickOverlay.swift in Sources */,
 				F9990189238ECEEB00D345CB /* AppDelegate.swift in Sources */,
+				F98C8E742399975100B16D28 /* Math.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -15,32 +15,65 @@ func make_node(from: Int) -> SKSpriteNode {
 
 let SIZE = 0.1
 
+let SPONGES = [
+    [10, 11],
+    [12, 82, 13],
+    [16, 14, 17],
+    [48, 49],
+    [32, 33],
+    [30, 28, 31],
+    [34, 33, 83],
+    [30, 28, 46, 31],
+    [30, 28, 47, 31],
+    [84, 52],
+    [94, 52, 53],
+    [98, 52, 53]
+]
+
 class GameScene: SKScene {
-    private var groundNodes: [[SKSpriteNode]]!
+    private var groundNodes: [SKSpriteNode]!
+    private var spongeNodes: [SKSpriteNode]!
+    
+    private var x = 0
     
     override func didMove(to view: SKView) {
+        backgroundColor = UIColor(rgb: 0x40d6cc)
+        
         groundNodes = []
         
-        // Create ground. TODO: add bones to ground
+        for x in [3, 7] {
+            let sponge = SPONGES.randomElement()!
+            for i in sponge {
+                let px = size.width * x / 10
+                let sponge_node = make_node(from: i)
+                sponge_node.position = CGPoint(x: px + Double.random(in: -10...10) / 100, y: 0.4)
+                sponge_node.size = CGSize(width: SIZE / 2, height: SIZE / 2)
+                                
+                addChild(sponge_node)
+            }
+        }
+        
+        // Create ground. TODO: add bones to ground, make more swirly
         let ground = [6, 7]
         for x in 0...10 {
-            let px = size.width * CGFloat(Double(x) / 10)
+            let px = size.width * x / 10
             let first = make_node(from: 1)
             first.position = CGPoint(x: px, y: 0.15)
             first.size = CGSize(width: SIZE, height: SIZE)
+            first.zPosition = 1
             
             let second = make_node(from: ground[x % ground.count])
             second.position = CGPoint(x: px, y: 0.3)
             second.size = CGSize(width: SIZE, height: SIZE)
+            second.zPosition = 1
             
-            groundNodes.append([])
-            groundNodes[x].append(first)
-            groundNodes[x].append(second)
+            groundNodes.append(first)
+            groundNodes.append(second)
+            
+            print(second.position)
             
             addChild(first)
             addChild(second)
-//            first.run(SKAction.moveBy(x: -1, y: -1, duration: 5))
-//            second.run(SKAction.moveBy(x: 1, y: 1, duration: 5))
         }
     }
     
