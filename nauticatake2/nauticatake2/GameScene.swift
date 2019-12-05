@@ -16,8 +16,8 @@ func make_node(from: Int, size: Double) -> SKSpriteNode {
     let n = SKSpriteNode(imageNamed: f)
     n.size = CGSize(width: size, height: size)
 //    n.physicsBody = SKPhysicsBody(texture: n.texture!, size: n.texture!.size())
-//    n.physicsBody = SKPhysicsBody(rectangleOf: n.size)
-    n.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(size))
+    n.physicsBody = SKPhysicsBody(rectangleOf: n.size)
+//    n.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(size))
     return n
 }
 
@@ -43,7 +43,7 @@ class GameScene: SKScene {
     private var x = 0
     
     override func didMove(to view: SKView) {
-        self.physicsWorld.gravity = CGVector(dx: 0.1, dy: -4.9)
+        physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
         
         backgroundColor = UIColor(rgb: 0x40d6cc)
         
@@ -58,7 +58,7 @@ class GameScene: SKScene {
 
                 sponge_node.physicsBody!.affectedByGravity = true
                 sponge_node.physicsBody!.allowsRotation = true
-                sponge_node.physicsBody!.isDynamic = false
+                sponge_node.physicsBody!.isDynamic = true
                 
                 addChild(sponge_node)
             }
@@ -71,17 +71,13 @@ class GameScene: SKScene {
             let first = make_node(from: 1, size: SIZE)
             first.position = CGPoint(x: px, y: 0.15)
             first.zPosition = 1
-            
-            first.physicsBody!.affectedByGravity = false
-            first.physicsBody!.allowsRotation = true
+
             first.physicsBody!.isDynamic = false
             
             let second = make_node(from: ground[x % ground.count], size: SIZE)
             second.position = CGPoint(x: px, y: 0.3)
             second.zPosition = 1
             
-            second.physicsBody!.affectedByGravity = false
-            second.physicsBody!.allowsRotation = true
             second.physicsBody!.isDynamic = false
             
             groundNodes.append(first)
