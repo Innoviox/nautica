@@ -13,6 +13,8 @@ func make_node(from: Int) -> SKSpriteNode {
     return SKSpriteNode(imageNamed: String(format: "fishTile_%03d", from))
 }
 
+let SIZE = 0.1
+
 class GameScene: SKScene {
     private var groundNodes: [[SKSpriteNode]]!
     
@@ -20,22 +22,26 @@ class GameScene: SKScene {
         groundNodes = []
         
         // Create ground. TODO: add bones to ground
+        let ground = [6, 7]
         for x in 0...10 {
+            let px = size.width * CGFloat(Double(x) / 10)
             let first = make_node(from: 1)
-            first.anchorPoint = CGPoint(x: x * 50, y: 0)
-            first.scale(to: CGSize(width: 50, height: 50))
-            let second = make_node(from: Int.random(in: 2 ..< 10))
-            second.anchorPoint = CGPoint(x: x * 50, y: 50)
-            second.scale(to: CGSize(width: 50, height: 50))
+            first.position = CGPoint(x: px, y: 0.15)
+            first.size = CGSize(width: SIZE, height: SIZE)
+            
+            let second = make_node(from: ground[x % ground.count])
+            second.position = CGPoint(x: px, y: 0.3)
+            second.size = CGSize(width: SIZE, height: SIZE)
             
             groundNodes.append([])
             groundNodes[x].append(first)
             groundNodes[x].append(second)
+            
+            addChild(first)
+            addChild(second)
+//            first.run(SKAction.moveBy(x: -1, y: -1, duration: 5))
+//            second.run(SKAction.moveBy(x: 1, y: 1, duration: 5))
         }
-    }
-    
-    func add_node_at() {
-        
     }
     
 //
