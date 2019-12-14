@@ -10,14 +10,17 @@ import SpriteKit
 import GameplayKit
 
 let SIZE = 0.1
+let FISH = 72
 
-func make_node(from: Int, size: Double) -> SKSpriteNode {
+func make_node(from: Int, size: Double, accurate: Bool = false) -> SKSpriteNode {
     let f = String(format: "fishTile_%03d", from)
     let n = SKSpriteNode(imageNamed: f)
     n.size = CGSize(width: size, height: size)
-//    n.physicsBody = SKPhysicsBody(texture: n.texture!, size: n.texture!.size())
-//    n.physicsBody = SKPhysicsBody(rectangleOf: n.size)
-//    n.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(size))
+    if accurate {
+        n.physicsBody = SKPhysicsBody(texture: n.texture!, size: n.texture!.size()) // basically pointwise
+    } else {
+        n.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(size * 0.9)) // much faster, for sponges
+    }
     return n
 }
 
@@ -40,10 +43,12 @@ class GameScene: SKScene {
     private var groundNodes: [SKSpriteNode]!
     private var spongeNodes: [SKSpriteNode]!
     
+    private var fish: SKSpriteNode!
+    
     private var x = 0
     
     override func didMove(to view: SKView) {
-        physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
+        physicsWorld.gravity = CGVector(dx: -0.01, dy: -0.01)
         
         backgroundColor = UIColor(rgb: 0x40d6cc)
         
@@ -56,9 +61,9 @@ class GameScene: SKScene {
                 let sponge_node = make_node(from: i, size: SIZE)
                 sponge_node.position = CGPoint(x: px + Double.random(in: -10...10) / 30, y: 0.37)
 
-//                sponge_node.physicsBody!.affectedByGravity = true
-//                sponge_node.physicsBody!.allowsRotation = true
-//                sponge_node.physicsBody!.isDynamic = true
+                sponge_node.physicsBody?.affectedByGravity = true
+                sponge_node.physicsBody?.allowsRotation = true
+                sponge_node.physicsBody?.isDynamic = true
                 
                 addChild(sponge_node)
             }
@@ -72,20 +77,33 @@ class GameScene: SKScene {
             first.position = CGPoint(x: px, y: 0.15)
             first.zPosition = 1
 
-//            first.physicsBody!.isDynamic = false
+            first.physicsBody?.affectedByGravity = false
+            first.physicsBody?.isDynamic = false
             
             let second = make_node(from: ground[x % ground.count], size: SIZE)
             second.position = CGPoint(x: px, y: 0.3)
             second.zPosition = 1
             
-//            second.physicsBody!.isDynamic = false
+            second.physicsBody?.affectedByGravity = false
+            second.physicsBody?.isDynamic = false
             
             groundNodes.append(first)
             groundNodes.append(second)
             
             addChild(first)
             addChild(second)
+            
+//            print(first.position)
         }
+        
+        fish = make_node(from: FISH, size: SIZE, accurate: false)
+        fish.position = CGPoint(x: 0.3, y: 0.7)
+        
+        fish.physicsBody?.affectedByGravity = true
+        fish.physicsBody?.allowsRotation = true
+        fish.physicsBody?.isDynamic = true
+        
+        addChild(fish)
     }
     
 //
