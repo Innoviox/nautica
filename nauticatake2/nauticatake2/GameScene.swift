@@ -12,14 +12,15 @@ import GameplayKit
 let SIZE = 0.1
 let FISH = 72
 
-func make_node(from: Int, size: Double, accurate: Bool = false) -> SKSpriteNode {
+func make_node(from: Int, size: Double, phys: Bool = false) -> SKSpriteNode {
     let f = String(format: "fishTile_%03d", from)
     let n = SKSpriteNode(imageNamed: f)
     n.size = CGSize(width: size, height: size)
-    if accurate {
-        n.physicsBody = SKPhysicsBody(texture: n.texture!, size: n.texture!.size()) // basically pointwise
-    } else {
-        n.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(size * 0.9)) // much faster, for sponges
+//    print("size", n.texture!.size())
+    if phys {
+//        n.physicsBody = SKPhysicsBody(texture: n.texture!, size: CGSize(width: size, height: size)) // basically pointwise
+//    } else {
+        n.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(0.055)) // much faster, for sponges
     }
     return n
 }
@@ -40,70 +41,55 @@ let SPONGES = [
 ]
 
 class GameScene: SKScene {
-    private var groundNodes: [SKSpriteNode]!
-    private var spongeNodes: [SKSpriteNode]!
-    
     private var fish: SKSpriteNode!
     
     private var x = 0
     
     override func didMove(to view: SKView) {
-        physicsWorld.gravity = CGVector(dx: -0.01, dy: -0.01)
+        self.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         
-        backgroundColor = UIColor(rgb: 0x40d6cc)
+//        self.backgroundColor = UIColor(rgb: 0x40d6cc)
         
-        groundNodes = []
         
         for x in [3, 7] {
             let sponge = SPONGES.randomElement()!
             for i in sponge {
-                let px = size.width * x / 10
+                let px = self.size.width * x / 10
                 let sponge_node = make_node(from: i, size: SIZE)
                 sponge_node.position = CGPoint(x: px + Double.random(in: -10...10) / 30, y: 0.37)
 
                 sponge_node.physicsBody?.affectedByGravity = true
-                sponge_node.physicsBody?.allowsRotation = true
-                sponge_node.physicsBody?.isDynamic = true
                 
-                addChild(sponge_node)
+                self.addChild(sponge_node)
             }
         }
         
         // Create ground. TODO: add bones to ground, make more swirly
         let ground = [6, 7]
         for x in 0...10 {
-            let px = size.width * x / 10
-            let first = make_node(from: 1, size: SIZE)
+            let px = self.size.width * x / 10
+            let first = make_node(from: 1, size: SIZE, phys: false)
             first.position = CGPoint(x: px, y: 0.15)
             first.zPosition = 1
 
             first.physicsBody?.affectedByGravity = false
-            first.physicsBody?.isDynamic = false
             
-            let second = make_node(from: ground[x % ground.count], size: SIZE)
+            let second = make_node(from: ground[x % ground.count], size: SIZE, phys: false)
             second.position = CGPoint(x: px, y: 0.3)
             second.zPosition = 1
             
             second.physicsBody?.affectedByGravity = false
-            second.physicsBody?.isDynamic = false
             
-            groundNodes.append(first)
-            groundNodes.append(second)
-            
-            addChild(first)
-            addChild(second)
-            
-//            print(first.position)
+            self.addChild(first)
+            self.addChild(second)
         }
         
-        fish = make_node(from: FISH, size: SIZE, accurate: false)
-        fish.position = CGPoint(x: 0.3, y: 0.7)
+        self.fish = make_node(from: FISH, size: SIZE, phys: true)
+        self.fish.position = CGPoint(x: 0.3, y: 0.7)
         
-        fish.physicsBody?.affectedByGravity = true
-        fish.physicsBody?.allowsRotation = true
-        fish.physicsBody?.isDynamic = true
+        self.fish.physicsBody?.affectedByGravity = false
         
-        addChild(fish)
+        self.addChild(self.fish)
     }
     
 //
