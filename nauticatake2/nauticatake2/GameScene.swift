@@ -41,7 +41,7 @@ class GameScene: SKScene {
     private var x = 0
     
     override func didMove(to view: SKView) {
-        self.physicsWorld.gravity = CGVector(dx: -0.01, dy: -0.01)
+        self.physicsWorld.gravity = CGVector(dx: -0.1, dy: -0.01)
         
 //        self.backgroundColor = UIColor(rgb: 0x40d6cc)
         
@@ -87,6 +87,7 @@ class GameScene: SKScene {
         self.fish.position = CGPoint(x: 0.3, y: 0.7)
         
         self.fish.physicsBody?.affectedByGravity = true
+        self.fish.physicsBody?.velocity.dx = 0
         
         self.addChild(self.fish)
     }
