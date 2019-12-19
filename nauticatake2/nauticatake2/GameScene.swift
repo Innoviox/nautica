@@ -49,7 +49,9 @@ let SPONGES = [
     [98, 52, 53]
 ]
 
-
+let C_SPONGE: UInt32 = 0
+let C_GROUND: UInt32 = 1
+let C_FISH: UInt32   = 1
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     private var fish: SKSpriteNode!
@@ -91,7 +93,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
             first.physicsBody?.affectedByGravity = false
             first.physicsBody?.isDynamic = false
-            first.physicsBody?.categoryBitMask = 1
+            first.physicsBody?.categoryBitMask = C_GROUND
             
             let second = make_node(from: ground[x % ground.count])
             second.position = CGPoint(x: px, y: 64 - yoff)
@@ -99,7 +101,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
             second.physicsBody?.affectedByGravity = false
             second.physicsBody?.isDynamic = false
-            second.physicsBody?.categoryBitMask = 1
+            second.physicsBody?.categoryBitMask = C_GROUND
             
             self.addChild(first)
             self.addChild(second)
@@ -114,7 +116,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.fish.physicsBody?.allowsRotation = false
         self.fish.physicsBody?.velocity.dx = 0
         self.fish.name = "fish"
-        self.fish.physicsBody?.collisionBitMask = 1
+        self.fish.physicsBody?.collisionBitMask = C_FISH
         
         self.addChild(self.fish)
         
@@ -134,7 +136,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sponge_node.physicsBody?.affectedByGravity = false
         sponge_node.physicsBody?.allowsRotation = false
         sponge_node.physicsBody?.isDynamic = true
-        sponge_node.physicsBody?.collisionBitMask = 0
+        sponge_node.physicsBody?.collisionBitMask = C_SPONGE
+        sponge_node.physicsBody?.categoryBitMask = C_SPONGE
         sponge_node.name = "sponge"
         
         self.addChild(sponge_node)
