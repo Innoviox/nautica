@@ -10,7 +10,11 @@ import SpriteKit
 import GameplayKit
 
 let SIZE = 64.0
-let FISH = 72
+
+let GREEN_FISH = 72
+let PURPLE_FISH = 74
+let BLUE_FISH = 76
+let RED_FISH = 78
 
 let PHYS_SIZE = [
     // ground
@@ -18,7 +22,8 @@ let PHYS_SIZE = [
     7: 38.0,
     
     // fish
-    72: 30.0
+    72: 30.0,
+    78: 30.0
 ]
 
 func make_node(from tile: Int) -> SKSpriteNode {
@@ -104,17 +109,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         self.addChild(real_ground)
         
-        self.fish = make_node(from: FISH)
-        self.fish.position = CGPoint(x: 300 - xoff, y: 300 - yoff)
-        
-        self.fish.physicsBody?.affectedByGravity = false
-        self.fish.physicsBody?.allowsRotation = false
-        self.fish.physicsBody?.velocity.dx = 0
-        self.fish.name = "fish"
-        self.fish.physicsBody?.collisionBitMask = C_GROUND
-        self.fish.physicsBody?.categoryBitMask = C_GROUND
-        
-        self.addChild(self.fish)
+        self.fish = self.make_fish(from: RED_FISH, x: 300, y: 300)
         
         let moveJoystickHiddenArea = TLAnalogJoystickHiddenArea(rect: CGRect(x: -xoff, y: -yoff, width: self.size.width / 2, height: self.size.height))
         moveJoystickHiddenArea.lineWidth = 0
@@ -149,6 +144,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ground.physicsBody?.collisionBitMask = 4
         ground.name = "ground\(n+1)"
         self.addChild(ground)
+    }
+    
+    func make_fish(from type: Int, x: CGFloat, y: CGFloat) -> SKSpriteNode {
+        let fish = make_node(from: type)
+        fish.position = CGPoint(x: x - xoff, y: y - yoff)
+        
+        fish.physicsBody?.affectedByGravity = false
+        fish.physicsBody?.allowsRotation = false
+        fish.physicsBody?.velocity.dx = 0
+        fish.name = "fish"
+        fish.physicsBody?.collisionBitMask = C_GROUND
+        fish.physicsBody?.categoryBitMask = C_GROUND
+        
+        self.addChild(fish)
+        
+        return fish
+    }
+    
+    func make_school(type: Int) {
+            
     }
     
     override func update(_ currentTime: TimeInterval) {
