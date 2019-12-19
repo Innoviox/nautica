@@ -14,8 +14,8 @@ let FISH = 72
 
 let PHYS_SIZE = [
     // ground
-    6: 45.0,
-    7: 45.0,
+    6: 34.0,
+    7: 38.0,
     
     // fish
     72: 30.0
@@ -27,6 +27,8 @@ func make_node(from tile: Int) -> SKSpriteNode {
     n.size = CGSize(width: SIZE, height: SIZE)
     if let phys = PHYS_SIZE[tile] {
         n.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(phys))
+    } else {
+        n.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(32.0))
     }
     
     return n
@@ -53,29 +55,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private var fish: SKSpriteNode!
     
     private var x = 0
+    private var current_sponge = SPONGES.randomElement()!
+    private var current_sponge_n = 0
+    
+    private var xoff = CGFloat.zero
+    private var yoff = CGFloat.zero
     
     override func didMove(to view: SKView) {
         print(self.size)
         self.physicsWorld.contactDelegate = self
-        self.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
+//        self.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         
 //        self.backgroundColor = UIColor(rgb: 0x40d6cc)
         
-        let xoff = size.width / 2 + 32
-        let yoff = size.height / 2
+        xoff = size.width / 2 + 32
+        yoff = size.height / 2
         
         for x in [3, 7] {
             let sponge = SPONGES.randomElement()!
             for i in sponge {
-                let px = self.size.width * x / 10
-                let sponge_node = make_node(from: i)
-                sponge_node.position = CGPoint(x: px + Double.random(in: -50...50) - xoff, y: 125 - yoff)
-
-                sponge_node.physicsBody?.affectedByGravity = true
-                sponge_node.physicsBody?.allowsRotation = true
-                sponge_node.physicsBody?.isDynamic = true
-                                
-                self.addChild(sponge_node)
+                self.make_sponge(of: i, xpos: self.size.width * x / 10 + Double.random(in: -50...50) - xoff)
             }
         }
         
@@ -88,27 +87,46 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             first.position = CGPoint(x: px, y: 0 - yoff)
             first.zPosition = 1
 
-            first.physicsBody?.affectedByGravity = true
+            first.physicsBody?.affectedByGravity = false
             first.physicsBody?.isDynamic = false
+            first.physicsBody?.categoryBitMask = 0b0010
             
             let second = make_node(from: ground[x % ground.count])
             second.position = CGPoint(x: px, y: 64 - yoff)
             second.zPosition = 1
             
-            second.physicsBody?.affectedByGravity = true
+            second.physicsBody?.affectedByGravity = false
             second.physicsBody?.isDynamic = false
+            second.physicsBody?.categoryBitMask = 0b0010
             
             self.addChild(first)
             self.addChild(second)
+            
+            
         }
         
         self.fish = make_node(from: FISH)
-        self.fish.position = CGPoint(x: 300, y: 300)
+        self.fish.position = CGPoint(x: 300 - xoff, y: 300 - yoff)
         
-        self.fish.physicsBody?.affectedByGravity = true
-//        self.fish.physicsBody?.velocity.dx = 0
+        self.fish.physicsBody?.affectedByGravity = false
+        self.fish.physicsBody?.velocity.dx = 0
+        self.fish.name = "fish"
+        self.fish.physicsBody?.collisionBitMask = 0b0010
         
         self.addChild(self.fish)
+    }
+    
+    func make_sponge(of i: Int, xpos: CGFloat) {
+        let sponge_node = make_node(from: i)
+        sponge_node.position = CGPoint(x: xpos, y: 125 - yoff)
+
+        sponge_node.physicsBody?.affectedByGravity = false
+        sponge_node.physicsBody?.allowsRotation = false
+        sponge_node.physicsBody?.isDynamic = true
+        sponge_node.physicsBody?.collisionBitMask = 0b0001
+        sponge_node.name = "sponge"
+        
+        self.addChild(sponge_node)
     }
     
 //
@@ -159,5 +177,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
+        for c in self.children {
+            if c.name != "fish" {
+                c.physicsBody?.velocity.dx = -250
+                if c.name == "sponge" {
+                    if c.position.x < -xoff {
+                        c.removeFromParent()
+                        if self.current_sponge_n == self.current_sponge.count {
+                            self.current_sponge_n = 0
+                            self.current_sponge = SPONGES.randomElement()!
+                        }
+                        make_sponge(of: self.current_sponge[self.current_sponge_n], xpos: xoff)
+                        self.current_sponge_n += 1
+                    }
+//                    if c.position.x <
+//                    c.removeFromParent()
+                }
+            }
+        }
     }
 }
