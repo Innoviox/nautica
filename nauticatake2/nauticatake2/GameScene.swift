@@ -92,6 +92,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             make_ground(of: ground[x % ground.count], xpos: px, n: 1)
         }
         
+        let path = CGMutablePath()
+        path.addLines(between: [CGPoint(x: -xoff, y: 80 - yoff), CGPoint(x: size.width - xoff, y: 80 - yoff)])
+        let real_ground = SKShapeNode(path: path)
+        real_ground.physicsBody = SKPhysicsBody(edgeChainFrom: path)
+        real_ground.physicsBody?.categoryBitMask = C_GROUND
+        real_ground.physicsBody?.collisionBitMask = C_GROUND
+        real_ground.physicsBody?.affectedByGravity = false
+        real_ground.physicsBody?.allowsRotation = false
+        real_ground.physicsBody?.isDynamic = false
+        
+        self.addChild(real_ground)
+        
         self.fish = make_node(from: FISH)
         self.fish.position = CGPoint(x: 300 - xoff, y: 300 - yoff)
         
@@ -99,7 +111,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.fish.physicsBody?.allowsRotation = false
         self.fish.physicsBody?.velocity.dx = 0
         self.fish.name = "fish"
-        self.fish.physicsBody?.collisionBitMask = C_FISH
+        self.fish.physicsBody?.collisionBitMask = C_GROUND
+        self.fish.physicsBody?.categoryBitMask = C_GROUND
         
         self.addChild(self.fish)
         
@@ -132,8 +145,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ground.zPosition = 1
 
         ground.physicsBody?.affectedByGravity = false
-//        ground.physicsBody?.isDynamic = false
-        ground.physicsBody?.categoryBitMask = C_GROUND
+        ground.physicsBody?.categoryBitMask = 2
+        ground.physicsBody?.collisionBitMask = 4
         ground.name = "ground\(n+1)"
         self.addChild(ground)
     }
@@ -155,19 +168,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     }
 //                    if c.position.x <
 //                    c.removeFromParent()
-                } else if c.name == "ground1" {
+                } else if c.name == "ground1" || c.name == "ground2" {
                     if c.position.x < -xoff {
-                        c.removeFromParent()
-                        make_ground(of: 1, xpos: xoff, n: 0)
-                    }
-                } else if c.name == "ground2" {
-                    if c.position.x < -xoff {
-                        c.removeFromParent()
-                        if self.current_ground_n == self.current_ground.count {
-                            self.current_ground_n = 0
-                        }
-                        make_ground(of: self.current_ground[self.current_ground_n], xpos: xoff, n: 1)
-                        self.current_ground_n += 1
+                        c.position.x += 2 * xoff
                     }
                 }
             } else {
