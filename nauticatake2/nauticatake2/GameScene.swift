@@ -59,6 +59,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private var x = 0
     private var current_sponge = SPONGES.randomElement()!
     private var current_sponge_n = 0
+    private var current_ground = [6, 7]
+    private var current_ground_n = 0
     
     private var xoff = CGFloat.zero
     private var yoff = CGFloat.zero
@@ -86,27 +88,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let ground = [6, 7]
         for x in 0...(Int(self.size.width / 64) + 1) {
             let px = (x * 64.0) - xoff
-
-            let first = make_node(from: 1)
-            first.position = CGPoint(x: px, y: 0 - yoff)
-            first.zPosition = 1
-
-            first.physicsBody?.affectedByGravity = false
-            first.physicsBody?.isDynamic = false
-            first.physicsBody?.categoryBitMask = C_GROUND
-            
-            let second = make_node(from: ground[x % ground.count])
-            second.position = CGPoint(x: px, y: 64 - yoff)
-            second.zPosition = 1
-            
-            second.physicsBody?.affectedByGravity = false
-            second.physicsBody?.isDynamic = false
-            second.physicsBody?.categoryBitMask = C_GROUND
-            
-            self.addChild(first)
-            self.addChild(second)
-            
-            
+            make_ground(of: 1, xpos: px, n: 0)
+            make_ground(of: ground[x % ground.count], xpos: px, n: 1)
         }
         
         self.fish = make_node(from: FISH)
@@ -143,51 +126,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(sponge_node)
     }
     
-//
-//    func touchDown(atPoint pos : CGPoint) {
-//        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-//            n.position = pos
-//            n.strokeColor = SKColor.green
-//            self.addChild(n)
-//        }
-//    }
-//
-//    func touchMoved(toPoint pos : CGPoint) {
-//        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-//            n.position = pos
-//            n.strokeColor = SKColor.blue
-//            self.addChild(n)
-//        }
-//    }
-//
-//    func touchUp(atPoint pos : CGPoint) {
-//        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-//            n.position = pos
-//            n.strokeColor = SKColor.red
-//            self.addChild(n)
-//        }
-//    }
-//
-//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        if let label = self.label {
-//            label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
-//        }
-//
-//        for t in touches { self.touchDown(atPoint: t.location(in: self)) }
-//    }
-//
-//    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
-//    }
-//
-//    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-//    }
-//
-//    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-//    }
-//
+    func make_ground(of i: Int, xpos: CGFloat, n: Int) {
+        let ground = make_node(from: i)
+        ground.position = CGPoint(x: xpos, y: n * 64 - yoff)
+        ground.zPosition = 1
+
+        ground.physicsBody?.affectedByGravity = false
+//        ground.physicsBody?.isDynamic = false
+        ground.physicsBody?.categoryBitMask = C_GROUND
+        ground.name = "ground\(n+1)"
+        self.addChild(ground)
+    }
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
@@ -206,6 +155,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     }
 //                    if c.position.x <
 //                    c.removeFromParent()
+                } else if c.name == "ground1" {
+                    if c.position.x < -xoff {
+                        c.removeFromParent()
+                        make_ground(of: 1, xpos: xoff, n: 0)
+                    }
+                } else if c.name == "ground2" {
+                    if c.position.x < -xoff {
+                        c.removeFromParent()
+                        if self.current_ground_n == self.current_ground.count {
+                            self.current_ground_n = 0
+                        }
+                        make_ground(of: self.current_ground[self.current_ground_n], xpos: xoff, n: 1)
+                        self.current_ground_n += 1
+                    }
                 }
             } else {
                 c.physicsBody?.velocity.dx = 0
@@ -216,4 +179,51 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     @objc func handleMove(joystick: TLAnalogJoystick) {
         self.fish.physicsBody?.velocity.dy = joystick.velocity.y * 5
     }
+    
+    //
+    //    func touchDown(atPoint pos : CGPoint) {
+    //        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
+    //            n.position = pos
+    //            n.strokeColor = SKColor.green
+    //            self.addChild(n)
+    //        }
+    //    }
+    //
+    //    func touchMoved(toPoint pos : CGPoint) {
+    //        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
+    //            n.position = pos
+    //            n.strokeColor = SKColor.blue
+    //            self.addChild(n)
+    //        }
+    //    }
+    //
+    //    func touchUp(atPoint pos : CGPoint) {
+    //        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
+    //            n.position = pos
+    //            n.strokeColor = SKColor.red
+    //            self.addChild(n)
+    //        }
+    //    }
+    //
+    //    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    //        if let label = self.label {
+    //            label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
+    //        }
+    //
+    //        for t in touches { self.touchDown(atPoint: t.location(in: self)) }
+    //    }
+    //
+    //    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    //        for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
+    //    }
+    //
+    //    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    //        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
+    //    }
+    //
+    //    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+    //        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
+    //    }
+    //
+        
 }
