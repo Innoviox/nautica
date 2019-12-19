@@ -21,6 +21,18 @@ func +(a: CGFloat, b: Double) -> CGFloat {
     a + CGFloat(b)
 }
 
+func -(a: Int, b: CGFloat) -> CGFloat {
+    CGFloat(a) - b
+}
+
+func *(a: Int, b: Double) -> Double {
+    Double(a) * b
+}
+
+func -(a: Double, b: CGFloat) -> CGFloat {
+    CGFloat(a) - b
+}
+
 extension UIColor {
     convenience init(red: Int, green: Int, blue: Int) {
         assert(red >= 0 && red <= 255, "Invalid red component")
