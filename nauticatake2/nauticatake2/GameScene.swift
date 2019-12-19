@@ -61,6 +61,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private var xoff = CGFloat.zero
     private var yoff = CGFloat.zero
     
+    let moveJoystick = TLAnalogJoystick(withDiameter: 100)
+    
     override func didMove(to view: SKView) {
         print(self.size)
         self.physicsWorld.contactDelegate = self
@@ -71,7 +73,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         xoff = size.width / 2 + 32
         yoff = size.height / 2
         
-        for x in [3, 7] {
+        for x in [1, 5, 9] {
             let sponge = SPONGES.randomElement()!
             for i in sponge {
                 self.make_sponge(of: i, xpos: self.size.width * x / 10 + Double.random(in: -50...50) - xoff)
@@ -89,7 +91,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
             first.physicsBody?.affectedByGravity = false
             first.physicsBody?.isDynamic = false
-            first.physicsBody?.categoryBitMask = 0b0010
+            first.physicsBody?.categoryBitMask = 1
             
             let second = make_node(from: ground[x % ground.count])
             second.position = CGPoint(x: px, y: 64 - yoff)
@@ -97,7 +99,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
             second.physicsBody?.affectedByGravity = false
             second.physicsBody?.isDynamic = false
-            second.physicsBody?.categoryBitMask = 0b0010
+            second.physicsBody?.categoryBitMask = 1
             
             self.addChild(first)
             self.addChild(second)
@@ -109,11 +111,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.fish.position = CGPoint(x: 300 - xoff, y: 300 - yoff)
         
         self.fish.physicsBody?.affectedByGravity = false
+        self.fish.physicsBody?.allowsRotation = false
         self.fish.physicsBody?.velocity.dx = 0
         self.fish.name = "fish"
-        self.fish.physicsBody?.collisionBitMask = 0b0010
+        self.fish.physicsBody?.collisionBitMask = 1
         
         self.addChild(self.fish)
+        
+        let moveJoystickHiddenArea = TLAnalogJoystickHiddenArea(rect: CGRect(x: -xoff, y: -yoff, width: self.size.width / 2, height: self.size.height))
+        moveJoystickHiddenArea.lineWidth = 0
+        moveJoystickHiddenArea.joystick = moveJoystick
+        moveJoystick.handleImage = UIImage(named: "joystick")
+        moveJoystick.baseImage = UIImage(named: "dpad")
+        moveJoystick.on(.move) { [unowned self] joystick in self.handleMove(joystick: joystick) }
+        addChild(moveJoystickHiddenArea)
     }
     
     func make_sponge(of i: Int, xpos: CGFloat) {
@@ -123,7 +134,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sponge_node.physicsBody?.affectedByGravity = false
         sponge_node.physicsBody?.allowsRotation = false
         sponge_node.physicsBody?.isDynamic = true
-        sponge_node.physicsBody?.collisionBitMask = 0b0001
+        sponge_node.physicsBody?.collisionBitMask = 0
         sponge_node.name = "sponge"
         
         self.addChild(sponge_node)
@@ -193,7 +204,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 //                    if c.position.x <
 //                    c.removeFromParent()
                 }
+            } else {
+                c.physicsBody?.velocity.dx = 0
             }
         }
+    }
+    
+    @objc func handleMove(joystick: TLAnalogJoystick) {
+        self.fish.physicsBody?.velocity.dy = joystick.velocity.y * 5
     }
 }
