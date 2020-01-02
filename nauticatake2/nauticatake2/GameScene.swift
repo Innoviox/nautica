@@ -16,6 +16,8 @@ let PURPLE_FISH = 74
 let BLUE_FISH = 76
 let RED_FISH = 78
 
+let SCORE = 108
+
 let PHYS_SIZE = [
     // ground
     6: 34.0,
@@ -70,8 +72,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private var xoff = CGFloat.zero
     private var yoff = CGFloat.zero
     
-    let moveJoystick = TLAnalogJoystick(withDiameter: 100)
+    private var score = 0
     
+    let moveJoystick = TLAnalogJoystick(withDiameter: 100)
+
     override func didMove(to view: SKView) {
         print(self.size)
         self.physicsWorld.contactDelegate = self
@@ -118,6 +122,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         moveJoystick.baseImage = UIImage(named: "dpad")
         moveJoystick.on(.move) { [unowned self] joystick in self.handleMove(joystick: joystick) }
         addChild(moveJoystickHiddenArea)
+        
+        self.init_score()
     }
     
     func make_sponge(of i: Int, xpos: CGFloat) {
@@ -130,6 +136,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sponge_node.physicsBody?.collisionBitMask = C_SPONGE
         sponge_node.physicsBody?.categoryBitMask = C_SPONGE
         sponge_node.name = "sponge"
+        
+        sponge_node.zPosition = CGFloat.random(in: 0...1)
         
         self.addChild(sponge_node)
     }
@@ -157,6 +165,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         fish.physicsBody?.collisionBitMask = C_GROUND
         fish.physicsBody?.categoryBitMask = C_GROUND
         
+        fish.zPosition = 0.5
+        
         self.addChild(fish)
         
         return fish
@@ -166,8 +176,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
     }
     
+    func init_score() {
+        var curr_x = xoff - 60
+        
+        for i in 0...10 {
+            let node = SKSpriteNode(imageNamed: "fishTile_108")
+            node.position = CGPoint(x: curr_x, y: yoff - 30)
+            node.name = "score\(i)"
+            node.isHidden = true
+            addChild(node)
+            curr_x -= node.texture!.size().width - 5
+        }
+    }
+    
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
+        score += 1
+        
         for c in self.children {
             if c.name != "fish" {
                 c.physicsBody?.velocity.dx = -250
@@ -187,10 +212,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     if c.position.x < -xoff {
                         c.position.x += 2 * xoff
                     }
+                } else if (c.name ?? "").contains("score") {
+                   update_score(for: Double(c.name!.last!.wholeNumberValue!))
                 }
             } else {
                 c.physicsBody?.velocity.dx = 0
+                
+                if c.position.y > yoff - 30 {
+                    c.position.y = yoff - 30
+                }
             }
+        }
+    }
+    
+    func update_score(for power: Double) {
+        let node = childNode(withName: "score\(Int(power))") as! SKSpriteNode
+        
+        let p = Int(pow(10.0, power))
+        
+        if score > p {
+            let number = Int(score / Int(p)) % 10
+            node.texture = SKTexture(imageNamed: "fishTile_\(108 + number)")
+            node.isHidden = false
+        } else {
+            node.isHidden = true
         }
     }
     
