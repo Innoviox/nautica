@@ -60,6 +60,10 @@ let C_SPONGE: UInt32 = 0
 let C_GROUND: UInt32 = 1
 let C_FISH: UInt32   = 1
 
+let MAX_LIVES = 3
+let DEAD = "fishTile_098"
+let ALIVE = "fishTile_099"
+
 class GameScene: SKScene, SKPhysicsContactDelegate {
     private var fish: SKSpriteNode!
     
@@ -73,6 +77,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private var yoff = CGFloat.zero
     
     private var score = 0
+    
+    private var lives = 3
     
     let moveJoystick = TLAnalogJoystick(withDiameter: 100)
 
@@ -124,6 +130,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(moveJoystickHiddenArea)
         
         self.init_score()
+        self.init_lives()
     }
     
     func make_sponge(of i: Int, xpos: CGFloat) {
@@ -189,9 +196,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    func init_lives() {
+        var curr_x = -xoff + 60
+        
+        for i in 0...2 {
+            let node = SKSpriteNode(imageNamed: ALIVE)
+            node.position = CGPoint(x: curr_x, y: yoff - 30)
+            node.name = "life\(i)"
+            addChild(node)
+            curr_x += node.texture!.size().width - 5
+        }
+    }
+    
+    func die() {
+        lives -= 1
+        let node = childNode(withName: "life\(lives)") as! SKSpriteNode
+        node.isHidden = true
+        
+        // todo blink
+    }
+    
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
         score += 1
+        
+        if score % 500 == 0 { die() }
         
         for c in self.children {
             if c.name != "fish" {
