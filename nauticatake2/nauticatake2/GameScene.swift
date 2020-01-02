@@ -64,6 +64,11 @@ let MAX_LIVES = 3
 let DEAD = "fishTile_098"
 let ALIVE = "fishTile_099"
 
+func text(_ i: Int) -> SKTexture { return SKTexture(imageNamed: String(format: "fishTile_%03d", i)) }
+func text(_ s: String) -> SKTexture { return SKTexture(imageNamed: s) }
+
+let FISH_BLINK = SKAction.animate(with: Array(repeating: [text(DEAD), text(RED_FISH)], count: 2).flatMap { $0 }, timePerFrame: 0.3)
+
 class GameScene: SKScene, SKPhysicsContactDelegate {
     private var fish: SKSpriteNode!
     
@@ -213,13 +218,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let node = childNode(withName: "life\(lives)") as! SKSpriteNode
         node.isHidden = true
         
-        // todo blink
+        self.fish.run(FISH_BLINK)
     }
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
         score += 1
-        
         if score % 500 == 0 { die() }
         
         for c in self.children {
