@@ -71,7 +71,7 @@ func text(_ s: String) -> SKTexture { return SKTexture(imageNamed: s) }
 //let FISH_BLINK = SKAction.animate(with: Array(repeating: [text(DEAD), text(RED_FISH)], count: 2).flatMap { $0 }, timePerFrame: 0.3) // blink texture
 let FISH_BLINK = SKAction.repeat(SKAction.sequence([SKAction.fadeOut(withDuration: 0.2),  SKAction.fadeIn(withDuration: 0.2)]), count: 3)
 
-class GameScene: SKScene, SKPhysicsContactDelegate {
+class GameScene: SKScene {
     private var fish: SKSpriteNode!
     
     private var x = 0
@@ -87,13 +87,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     private var lives = 3
     
+    private var dying = false
+    
     private var current_speed: CGFloat = 250
     
     let moveJoystick = TLAnalogJoystick(withDiameter: 100)
 
     override func didMove(to view: SKView) {
         print(self.size)
-        self.physicsWorld.contactDelegate = self
 //        self.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         
 //        self.backgroundColor = UIColor(rgb: 0x40d6cc)
@@ -140,6 +141,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         self.init_score()
         self.init_lives()
+        
+        physicsWorld.contactDelegate = self
+        print(physicsWorld.contactDelegate)
     }
     
     func make_sponge(of i: Int, xpos: CGFloat) {
@@ -199,15 +203,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         switch type {
         case 1: do {
             let fish = make_node(from: GREEN_FISH)
-            fish.position = CGPoint(x: xoff, y: CGFloat.random(in: (-yoff)...(size.height/2)))
+            fish.position = CGPoint(x: xoff, y: CGFloat.random(in: (-yoff+128)...(size.height/2)))
             
             fish.xScale = -fish.xScale
                         
-            fish.physicsBody?.affectedByGravity = false
-            fish.physicsBody?.allowsRotation = false
+            fish.physicsBody!.affectedByGravity = false
+            fish.physicsBody!.allowsRotation = false
             fish.name = "enemy"
-            fish.physicsBody?.collisionBitMask = C_DEADLY
-            fish.physicsBody?.categoryBitMask = C_DEADLY
+            fish.physicsBody!.collisionBitMask = C_DEADLY
+            fish.physicsBody!.categoryBitMask = C_DEADLY
+            fish.physicsBody!.isDynamic = true
             
             fish.zPosition = 0.5
             
@@ -243,11 +248,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func die() {
+        if dying { return }
+        dying = true
         lives -= 1
         let node = childNode(withName: "life\(lives)") as! SKSpriteNode
         node.isHidden = true
         
-        self.fish.run(FISH_BLINK)
+        self.fish.run(FISH_BLINK) { self.dying = false }
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -313,6 +320,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.fish.physicsBody?.velocity.dy = joystick.velocity.y * 5
     }
     
+    
     //
     //    func touchDown(atPoint pos : CGPoint) {
     //        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
@@ -359,4 +367,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //    }
     //
         
+}
+
+extension GameScene: SKPhysicsContactDelegate  {
+    func didBegin(_ contact: SKPhysicsContact) {
+        print("didbegin!")
+        let firstBody: SKPhysicsBody = contact.bodyA
+        let secondBody: SKPhysicsBody = contact.bodyB
+
+        if !dying && firstBody.categoryBitMask == C_FISH && secondBody.categoryBitMask == C_DEADLY {
+            die()
+        }
+    }
 }
