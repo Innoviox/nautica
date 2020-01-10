@@ -97,39 +97,42 @@ class GameScene: SKScene {
     
     private var dying = false
     
+    private var w = CGFloat.zero
+    private var h = CGFloat.zero
+    
     private var current_speed: CGFloat = 250
     
     let moveJoystick = TLAnalogJoystick(withDiameter: 100)
 
     override func didMove(to view: SKView) {
-        print(self.size)
+        print(self.size, self.w, self.h)
+        h = self.size.width
+        w = self.size.height
 //        self.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         
 //        self.backgroundColor = UIColor(rgb: 0x40d6cc)
+
         
-        xoff = size.width / 2 + 32
-        yoff = size.height / 4
-        
-        global_xoff = size.width / 4
-        global_yoff = size.height / 4
+        xoff = w / 2 + 32
+        yoff = h / 2
         
         for x in [1, 5, 9] {
             let sponge = SPONGES.randomElement()!
             for i in sponge {
-                self.make_sponge(of: i, xpos: self.size.width * x / 10 + Double.random(in: -50...50) - xoff)
+                self.make_sponge(of: i, xpos: self.w * x / 10 + Double.random(in: -50...50) - xoff)
             }
         }
         
         // Create ground. TODO: add bones to ground, make more swirly
         let ground = [6, 7]
-        for x in 0...(Int(self.size.width / 64) + 1) {
+        for x in 0...(Int(self.w / 64) + 1) {
             let px = (x * 64.0) - xoff
             make_ground(of: 1, xpos: px, n: 0)
             make_ground(of: ground[x % ground.count], xpos: px, n: 1)
         }
         
         let path = CGMutablePath()
-        path.addLines(between: [CGPoint(x: -xoff, y: 80 - yoff), CGPoint(x: size.width - xoff, y: 80 - yoff)])
+        path.addLines(between: [CGPoint(x: -xoff, y: 80 - yoff), CGPoint(x: w - xoff, y: 80 - yoff)])
         let real_ground = SKShapeNode(path: path)
         real_ground.physicsBody = SKPhysicsBody(edgeChainFrom: path)
         real_ground.physicsBody?.categoryBitMask = C_GROUND
@@ -142,7 +145,7 @@ class GameScene: SKScene {
         
         self.fish = self.make_fish(from: RED_FISH, x: 300, y: 300)
         
-        let moveJoystickHiddenArea = TLAnalogJoystickHiddenArea(rect: CGRect(x: -xoff, y: -yoff, width: self.size.width / 2, height: self.size.height))
+        let moveJoystickHiddenArea = TLAnalogJoystickHiddenArea(rect: CGRect(x: -xoff, y: -yoff, width: self.w / 2, height: self.h))
         moveJoystickHiddenArea.lineWidth = 0
         moveJoystickHiddenArea.joystick = moveJoystick
         moveJoystick.handleImage = UIImage(named: "joystick")
@@ -214,7 +217,7 @@ class GameScene: SKScene {
         switch type {
         case 1: do {
             let fish = make_node(from: GREEN_FISH)
-            fish.position = CGPoint(x: xoff, y: CGFloat.random(in: (-yoff+128)...(size.height/2)))
+            fish.position = CGPoint(x: xoff, y: CGFloat.random(in: (-yoff+128)...(h/2)))
             
             fish.xScale = -fish.xScale
                         
