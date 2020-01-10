@@ -32,10 +32,14 @@ func make_node(from tile: Int) -> SKSpriteNode {
     let f = String(format: "fishTile_%03d", tile)
     let n = SKSpriteNode(imageNamed: f)
     n.size = CGSize(width: SIZE, height: SIZE)
-    if let phys = PHYS_SIZE[tile] {
-        n.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(phys))
+    if tile == 72 || tile == 74 || tile == 76 || tile == 78 {
+        n.physicsBody = SKPhysicsBody(texture: n.texture!, size: n.texture!.size())
     } else {
-        n.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(32.0))
+        if let phys = PHYS_SIZE[tile] {
+            n.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(phys))
+        } else {
+            n.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(32.0))
+        }
     }
     
     return n
@@ -143,7 +147,6 @@ class GameScene: SKScene {
         self.init_lives()
         
         physicsWorld.contactDelegate = self
-        print(physicsWorld.contactDelegate)
     }
     
     func make_sponge(of i: Int, xpos: CGFloat) {
@@ -184,6 +187,7 @@ class GameScene: SKScene {
         fish.name = "fish"
         fish.physicsBody?.collisionBitMask = C_GROUND
         fish.physicsBody?.categoryBitMask = C_GROUND
+        fish.physicsBody?.contactTestBitMask = C_DEADLY
         
         fish.zPosition = 0.5
         
