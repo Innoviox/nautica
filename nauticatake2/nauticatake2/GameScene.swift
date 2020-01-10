@@ -63,7 +63,7 @@ let SPONGES = [
 let C_SPONGE: UInt32 = 0
 let C_GROUND: UInt32 = 1
 let C_FISH: UInt32   = 1
-let C_DEADLY: UInt32 = 2
+let C_DEADLY: UInt32 = 8
 
 let MAX_LIVES = 3
 let DEAD = "fishTile_098"
@@ -87,6 +87,10 @@ class GameScene: SKScene {
     private var xoff = CGFloat.zero
     private var yoff = CGFloat.zero
     
+    // i hate swift
+    private var global_xoff = CGFloat.zero
+    private var global_yoff = CGFloat.zero
+    
     private var score = 0
     
     private var lives = 3
@@ -104,7 +108,10 @@ class GameScene: SKScene {
 //        self.backgroundColor = UIColor(rgb: 0x40d6cc)
         
         xoff = size.width / 2 + 32
-        yoff = size.height / 2
+        yoff = size.height / 4
+        
+        global_xoff = size.width / 4
+        global_yoff = size.height / 4
         
         for x in [1, 5, 9] {
             let sponge = SPONGES.randomElement()!
@@ -252,7 +259,7 @@ class GameScene: SKScene {
     }
     
     func die() {
-        if dying { return }
+        if dying || lives == 0 { return }
         dying = true
         lives -= 1
         let node = childNode(withName: "life\(lives)") as! SKSpriteNode
@@ -375,10 +382,9 @@ class GameScene: SKScene {
 
 extension GameScene: SKPhysicsContactDelegate  {
     func didBegin(_ contact: SKPhysicsContact) {
-        print("didbegin!")
         let firstBody: SKPhysicsBody = contact.bodyA
         let secondBody: SKPhysicsBody = contact.bodyB
-
+        
         if !dying && firstBody.categoryBitMask == C_FISH && secondBody.categoryBitMask == C_DEADLY {
             die()
         }

@@ -39,9 +39,9 @@ class GameViewController: UIViewController {
 
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         if UIDevice.current.userInterfaceIdiom == .phone {
-            return .landscape
+            return .landscapeLeft
         } else {
-            return .landscape
+            return .landscapeLeft
         }
     }
 
