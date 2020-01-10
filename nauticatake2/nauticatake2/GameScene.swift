@@ -59,6 +59,7 @@ let SPONGES = [
 let C_SPONGE: UInt32 = 0
 let C_GROUND: UInt32 = 1
 let C_FISH: UInt32   = 1
+let C_DEADLY: UInt32 = 2
 
 let MAX_LIVES = 3
 let DEAD = "fishTile_098"
@@ -67,7 +68,8 @@ let ALIVE = "fishTile_099"
 func text(_ i: Int) -> SKTexture { return SKTexture(imageNamed: String(format: "fishTile_%03d", i)) }
 func text(_ s: String) -> SKTexture { return SKTexture(imageNamed: s) }
 
-let FISH_BLINK = SKAction.animate(with: Array(repeating: [text(DEAD), text(RED_FISH)], count: 2).flatMap { $0 }, timePerFrame: 0.3)
+//let FISH_BLINK = SKAction.animate(with: Array(repeating: [text(DEAD), text(RED_FISH)], count: 2).flatMap { $0 }, timePerFrame: 0.3) // blink texture
+let FISH_BLINK = SKAction.repeat(SKAction.sequence([SKAction.fadeOut(withDuration: 0.2),  SKAction.fadeIn(withDuration: 0.2)]), count: 3)
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     private var fish: SKSpriteNode!
@@ -84,6 +86,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private var score = 0
     
     private var lives = 3
+    
+    private var current_speed: CGFloat = 250
     
     let moveJoystick = TLAnalogJoystick(withDiameter: 100)
 
@@ -184,8 +188,33 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         return fish
     }
     
-    func make_school(type: Int) {
+    func make_enemy(type: Int) {
+        // enemy ideas:
+        // static fish
+        // rocks with electricity between them
+        // fish missiles
+        // bubble vents from the bottom that you touch to deactivate
+        // bubbles across the screen
+        
+        switch type {
+        case 1: do {
+            let fish = make_node(from: GREEN_FISH)
+            fish.position = CGPoint(x: xoff, y: CGFloat.random(in: (-yoff)...(size.height/2)))
             
+            fish.xScale = -fish.xScale
+                        
+            fish.physicsBody?.affectedByGravity = false
+            fish.physicsBody?.allowsRotation = false
+            fish.name = "enemy"
+            fish.physicsBody?.collisionBitMask = C_DEADLY
+            fish.physicsBody?.categoryBitMask = C_DEADLY
+            
+            fish.zPosition = 0.5
+            
+            self.addChild(fish)
+        }
+        default: break
+        }
     }
     
     func init_score() {
@@ -224,11 +253,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
         score += 1
-        if score % 500 == 0 { die() }
+        current_speed += CGFloat(score) / 10000
+        
+//        if score % 200 == 0 { die() }
+        
+        if Double.random(in: 0...1) < 0.02 { make_enemy(type: 1) }
         
         for c in self.children {
             if c.name != "fish" {
-                c.physicsBody?.velocity.dx = -250
+                c.physicsBody?.velocity.dx = -current_speed
                 if c.name == "sponge" {
                     if c.position.x < -xoff {
                         c.removeFromParent()
@@ -247,6 +280,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     }
                 } else if (c.name ?? "").contains("score") {
                    update_score(for: Double(c.name!.last!.wholeNumberValue!))
+                } else if c.name == "enemy" {
+                    if c.position.x < -xoff {
+                        c.removeFromParent()
+                    }
                 }
             } else {
                 c.physicsBody?.velocity.dx = 0
