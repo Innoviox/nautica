@@ -291,7 +291,6 @@ class GameScene: SKScene {
     }
     
     func spawn_bubble() {
-        print("SPAWNING BUBBLE")
         let bubble = make_node(from: 123 + Int.random(in: 0...2))
         bubble.physicsBody!.affectedByGravity = false
         bubble.name = "bubble"
@@ -319,7 +318,7 @@ class GameScene: SKScene {
         } else {
             score += 1
         }
-        current_speed += 1 / 1000
+        current_speed += 1 / 100
         
         if bubbling {
             self.spawn_bubble()
@@ -330,7 +329,15 @@ class GameScene: SKScene {
         if Double.random(in: 0...1) < 0.02 { make_enemy(type: 1) }
         
         for c in self.children {
-            if c.name != "fish" {
+            if c.name == "fish" {
+                c.physicsBody?.velocity.dx = 0
+                
+                if c.position.y > yoff - 30 {
+                    c.position.y = yoff - 30
+                }
+            } else if c.name == "bubble" {
+                c.physicsBody?.velocity.dx = 500
+            } else {
                 c.physicsBody?.velocity.dx = -current_speed
                 if c.name == "sponge" {
                     if c.position.x < -xoff {
@@ -354,12 +361,6 @@ class GameScene: SKScene {
                     if c.position.x < -xoff {
                         c.removeFromParent()
                     }
-                }
-            } else {
-                c.physicsBody?.velocity.dx = 0
-                
-                if c.position.y > yoff - 30 {
-                    c.position.y = yoff - 30
                 }
             }
         }
@@ -436,12 +437,15 @@ extension GameScene: SKPhysicsContactDelegate  {
     func didBegin(_ contact: SKPhysicsContact) {
         let firstBody: SKPhysicsBody = contact.bodyA
         let secondBody: SKPhysicsBody = contact.bodyB
-        
+        print("Hello, checking collision", firstBody.categoryBitMask, firstBody.collisionBitMask, secondBody.categoryBitMask, secondBody.collisionBitMask)
+
         if !dying && firstBody.categoryBitMask == C_FISH && secondBody.categoryBitMask == C_DEADLY {
             die()
         }
         
-        if firstBody.categoryBitMask == C_BUBBLE && secondBody.categoryBitMask == C_DEADLY{
+        
+        if firstBody.categoryBitMask == C_BUBBLE && secondBody.categoryBitMask == C_DEADLY {
+            print("bubbling?")
             secondBody.node!.removeFromParent()
         } else if secondBody.categoryBitMask == C_BUBBLE && firstBody.categoryBitMask == C_DEADLY {
             firstBody.node!.removeFromParent()
