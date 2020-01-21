@@ -339,7 +339,7 @@ class GameScene: SKScene {
         
 //        if score % 200 == 0 { die() }
         
-        if Double.random(in: 0...1) < 0.10 { make_enemy(type: 1) }
+        if Double.random(in: 0...1) < 0.05 { make_enemy(type: 1) }
         
         for c in self.children {
             if c.name == "fish" {
