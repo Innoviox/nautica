@@ -70,6 +70,7 @@ let C_SPONGE: UInt32 = 0
 let C_GROUND: UInt32 = 1
 let C_FISH: UInt32   = 1
 let C_DEADLY: UInt32 = 8
+let C_BUBBLE: UInt32 = 16
 
 let MAX_LIVES = 3
 let DEAD = "fishTile_098"
@@ -111,6 +112,7 @@ class GameScene: SKScene {
     let moveJoystick = TLAnalogJoystick(withDiameter: 100)
     
     private var bubble_button: ImageButton!
+    private var bubbling = false
 
     override func didMove(to view: SKView) {
         print(self.size, self.w, self.h)
@@ -119,13 +121,14 @@ class GameScene: SKScene {
 //        self.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         
 //        self.backgroundColor = UIColor(rgb: 0x40d6cc)
-
-        self.bubble_button = ImageButton(defaultImage: "bubble_off", activeImage: "bubble_on", size: CGSize(width: 32, height: 32), position: CGPoint(x: 50, y: -yoff), buttonAction: bubble(on:))
-        addChild(bubble_button)
-        
         
         xoff = w / 2 + 32
         yoff = h / 2
+        
+        self.bubble_button = ImageButton(defaultImage: "dpad", activeImage: "dpad_clicked", size: CGSize(width: 96, height: 96), position: CGPoint(x: h - 160, y: -yoff + 100), buttonAction: bubble(on:))
+        bubble_button.zPosition = 10403
+        addChild(bubble_button)
+        
         
         for x in [1, 5, 9] {
             let sponge = SPONGES.randomElement()!
@@ -219,6 +222,7 @@ class GameScene: SKScene {
     }
     
     @objc func bubble(on: Bool) {
+        bubbling = on
     }
     
     func make_enemy(type: Int) {
@@ -286,10 +290,40 @@ class GameScene: SKScene {
         self.fish.run(FISH_BLINK) { self.dying = false }
     }
     
+    func spawn_bubble() {
+        print("SPAWNING BUBBLE")
+        let bubble = make_node(from: 123 + Int.random(in: 0...2))
+        bubble.physicsBody!.affectedByGravity = false
+        bubble.name = "bubble"
+        bubble.physicsBody!.collisionBitMask = C_DEADLY
+        bubble.physicsBody!.categoryBitMask = C_BUBBLE
+        bubble.physicsBody!.isDynamic = true
+        
+        bubble.position.x = fish.position.x + 10
+        bubble.position.y = fish.position.y
+        
+        bubble.physicsBody!.velocity.dx = 50
+        bubble.physicsBody!.velocity.dy = 0
+        
+        bubble.zPosition = 1.0
+        addChild(bubble)
+    }
+    
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
-        score += 1
-        current_speed += CGFloat(score) / 10000
+        if bubbling {
+            score -= 1
+            if score <= 0 {
+                bubbling = false
+            }
+        } else {
+            score += 1
+        }
+        current_speed += 1 / 1000
+        
+        if bubbling {
+            self.spawn_bubble()
+        }
         
 //        if score % 200 == 0 { die() }
         
@@ -405,6 +439,12 @@ extension GameScene: SKPhysicsContactDelegate  {
         
         if !dying && firstBody.categoryBitMask == C_FISH && secondBody.categoryBitMask == C_DEADLY {
             die()
+        }
+        
+        if firstBody.categoryBitMask == C_BUBBLE && secondBody.categoryBitMask == C_DEADLY{
+            secondBody.node!.removeFromParent()
+        } else if secondBody.categoryBitMask == C_BUBBLE && firstBody.categoryBitMask == C_DEADLY {
+            firstBody.node!.removeFromParent()
         }
     }
 }
