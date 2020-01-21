@@ -306,7 +306,8 @@ class GameScene: SKScene {
         bubble.physicsBody!.affectedByGravity = false
         bubble.name = "bubble"
         bubble.physicsBody!.collisionBitMask = C_DEADLY
-        bubble.physicsBody!.categoryBitMask = C_DEADLY
+        bubble.physicsBody!.categoryBitMask = C_BUBBLE
+        bubble.physicsBody?.contactTestBitMask = C_DEADLY
         bubble.physicsBody!.isDynamic = true
         
         bubble.position.x = fish.position.x + 30
@@ -452,14 +453,17 @@ extension GameScene: SKPhysicsContactDelegate  {
     func didBegin(_ contact: SKPhysicsContact) {
         let firstBody: SKPhysicsBody = contact.bodyA
         let secondBody: SKPhysicsBody = contact.bodyB
-        print("checking collision", firstBody.categoryBitMask, firstBody.collisionBitMask, secondBody.categoryBitMask, secondBody.collisionBitMask)
+//        print("checking collision", firstBody.categoryBitMask, firstBody.collisionBitMask, secondBody.categoryBitMask, secondBody.collisionBitMask,
+//              firstBody.node!.name, secondBody.node!.name)
 
         if !dying && firstBody.categoryBitMask == C_FISH && firstBody.node!.name == "fish" && secondBody.categoryBitMask == C_DEADLY && secondBody.node!.name == "enemy" {
             die()
         }
         
-        if firstBody.categoryBitMask == C_FISH && firstBody.node!.name == "bubble" && secondBody.categoryBitMask == C_DEADLY {
-            secondBody.node!.removeFromParent()
+        if firstBody.categoryBitMask == C_BUBBLE && secondBody.categoryBitMask == C_DEADLY ||
+           secondBody.categoryBitMask == C_BUBBLE && firstBody.categoryBitMask == C_DEADLY {
+            firstBody.node?.removeFromParent()
+            secondBody.node?.removeFromParent()
         }
     }
 }

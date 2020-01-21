@@ -24,7 +24,9 @@ class EndScene: SKScene {
     }
     
     override func didMove(to view: SKView) {
-        let node = SKLabelNode(text: "You died\nFinal Score: \(score)")
+        scene!.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        let node = SKLabelNode(text: "You died :(\nFinal Score: \(score)")
+        node.numberOfLines = 2
         addChild(node)
     }
 }
