@@ -5,6 +5,12 @@
 //  Created by Sarah Leavitt on 11/27/19.
 //  Copyright © 2019 Innoviox. All rights reserved.
 //
+// TODO
+// - shoot bubbles
+// - missile fish
+// - powerups
+// - lasers
+// - more powerups
 
 import SpriteKit
 import GameplayKit
@@ -103,6 +109,8 @@ class GameScene: SKScene {
     private var current_speed: CGFloat = 250
     
     let moveJoystick = TLAnalogJoystick(withDiameter: 100)
+    
+    private var bubble_button: ImageButton!
 
     override func didMove(to view: SKView) {
         print(self.size, self.w, self.h)
@@ -112,6 +120,9 @@ class GameScene: SKScene {
         
 //        self.backgroundColor = UIColor(rgb: 0x40d6cc)
 
+        self.bubble_button = ImageButton(defaultImage: "bubble_off", activeImage: "bubble_on", size: CGSize(width: 32, height: 32), position: CGPoint(x: 50, y: -yoff), buttonAction: bubble(on:))
+        addChild(bubble_button)
+        
         
         xoff = w / 2 + 32
         yoff = h / 2
@@ -157,6 +168,7 @@ class GameScene: SKScene {
         self.init_lives()
         
         physicsWorld.contactDelegate = self
+        
     }
     
     func make_sponge(of i: Int, xpos: CGFloat) {
@@ -204,6 +216,9 @@ class GameScene: SKScene {
         self.addChild(fish)
         
         return fish
+    }
+    
+    @objc func bubble(on: Bool) {
     }
     
     func make_enemy(type: Int) {
