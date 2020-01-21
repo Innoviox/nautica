@@ -295,10 +295,10 @@ class GameScene: SKScene {
         bubble.physicsBody!.affectedByGravity = false
         bubble.name = "bubble"
         bubble.physicsBody!.collisionBitMask = C_DEADLY
-        bubble.physicsBody!.categoryBitMask = C_BUBBLE
+        bubble.physicsBody!.categoryBitMask = C_DEADLY
         bubble.physicsBody!.isDynamic = true
         
-        bubble.position.x = fish.position.x + 10
+        bubble.position.x = fish.position.x + 30
         bubble.position.y = fish.position.y
         
         bubble.physicsBody!.velocity.dx = 50
@@ -314,13 +314,14 @@ class GameScene: SKScene {
             score -= 1
             if score <= 0 {
                 bubbling = false
+                bubble_button.flip()
             }
         } else {
             score += 1
         }
-        current_speed += 1 / 100
+        current_speed += 1
         
-        if bubbling {
+        if bubbling && self.score % 10 == 0 {
             self.spawn_bubble()
         }
         
@@ -337,6 +338,9 @@ class GameScene: SKScene {
                 }
             } else if c.name == "bubble" {
                 c.physicsBody?.velocity.dx = 500
+                if c.position.x > xoff * 2 {
+                    c.removeFromParent()
+                }
             } else {
                 c.physicsBody?.velocity.dx = -current_speed
                 if c.name == "sponge" {
@@ -437,18 +441,14 @@ extension GameScene: SKPhysicsContactDelegate  {
     func didBegin(_ contact: SKPhysicsContact) {
         let firstBody: SKPhysicsBody = contact.bodyA
         let secondBody: SKPhysicsBody = contact.bodyB
-        print("Hello, checking collision", firstBody.categoryBitMask, firstBody.collisionBitMask, secondBody.categoryBitMask, secondBody.collisionBitMask)
+        print("checking collision", firstBody.categoryBitMask, firstBody.collisionBitMask, secondBody.categoryBitMask, secondBody.collisionBitMask)
 
-        if !dying && firstBody.categoryBitMask == C_FISH && secondBody.categoryBitMask == C_DEADLY {
+        if !dying && firstBody.categoryBitMask == C_FISH && firstBody.node!.name == "fish" && secondBody.categoryBitMask == C_DEADLY && secondBody.node!.name == "enemy" {
             die()
         }
         
-        
-        if firstBody.categoryBitMask == C_BUBBLE && secondBody.categoryBitMask == C_DEADLY {
-            print("bubbling?")
+        if firstBody.categoryBitMask == C_FISH && firstBody.node!.name == "bubble" && secondBody.categoryBitMask == C_DEADLY {
             secondBody.node!.removeFromParent()
-        } else if secondBody.categoryBitMask == C_BUBBLE && firstBody.categoryBitMask == C_DEADLY {
-            firstBody.node!.removeFromParent()
         }
     }
 }

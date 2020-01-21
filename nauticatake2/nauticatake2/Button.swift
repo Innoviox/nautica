@@ -54,6 +54,14 @@ class Button: SKSpriteNode {
      Calls .action and toggles .on.
     */
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        flip()
+        action(on)
+    }
+    
+    /**
+     Flip button without action.
+     */
+    func flip() {
         if !on {
             activeButton.isHidden = false
             defaultButton.isHidden = true
@@ -63,7 +71,6 @@ class Button: SKSpriteNode {
             activeButton.isHidden = true
             defaultButton.isHidden = false
         }
-        action(on)
     }
 }
 
