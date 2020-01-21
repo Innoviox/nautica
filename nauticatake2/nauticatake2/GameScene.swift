@@ -337,6 +337,8 @@ class GameScene: SKScene {
             self.spawn_bubble()
         }
         
+        print("no")
+        
 //        if score % 200 == 0 { die() }
         
         if Double.random(in: 0...1) < 0.05 { make_enemy(type: 1) }
