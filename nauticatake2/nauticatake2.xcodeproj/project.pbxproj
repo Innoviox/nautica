@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		F932601023D73465004DF631 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = F932600F23D73465004DF631 /* Button.swift */; };
+		F932601223D73CEC004DF631 /* EndScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = F932601123D73CEC004DF631 /* EndScene.swift */; };
 		F957837423ABF3FD00DCE773 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = F957837323ABF3FD00DCE773 /* GameScene.sks */; };
 		F98C8E742399975100B16D28 /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98C8E732399975100B16D28 /* Math.swift */; };
 		F9990189238ECEEB00D345CB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9990188238ECEEB00D345CB /* AppDelegate.swift */; };
@@ -42,6 +43,7 @@
 
 /* Begin PBXFileReference section */
 		F932600F23D73465004DF631 /* Button.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
+		F932601123D73CEC004DF631 /* EndScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndScene.swift; sourceTree = "<group>"; };
 		F957837323ABF3FD00DCE773 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		F98C8E732399975100B16D28 /* Math.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Math.swift; sourceTree = "<group>"; };
 		F9990185238ECEEA00D345CB /* nauticatake2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nauticatake2.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -124,6 +126,7 @@
 				F98C8E732399975100B16D28 /* Math.swift */,
 				F957837323ABF3FD00DCE773 /* GameScene.sks */,
 				F932600F23D73465004DF631 /* Button.swift */,
+				F932601123D73CEC004DF631 /* EndScene.swift */,
 			);
 			path = nauticatake2;
 			sourceTree = "<group>";
@@ -285,6 +288,7 @@
 				F9990191238ECEEB00D345CB /* GameViewController.swift in Sources */,
 				F99901BF238ECF3B00D345CB /* JoystickOverlay.swift in Sources */,
 				F9990189238ECEEB00D345CB /* AppDelegate.swift in Sources */,
+				F932601223D73CEC004DF631 /* EndScene.swift in Sources */,
 				F98C8E742399975100B16D28 /* Math.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

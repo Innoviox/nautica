@@ -281,13 +281,24 @@ class GameScene: SKScene {
     }
     
     func die() {
-        if dying || lives == 0 { return }
+        if lives == 0 {
+            end_screen()
+            return
+        }
+        if dying { return }
         dying = true
         lives -= 1
         let node = childNode(withName: "life\(lives)") as! SKSpriteNode
         node.isHidden = true
         
         self.fish.run(FISH_BLINK) { self.dying = false }
+    }
+    
+    func end_screen() {
+        let reveal = SKTransition.crossFade(withDuration: 1)
+        let newScene = EndScene(size: size, score: score)
+        
+        (scene!.view as! SKView).presentScene(newScene, transition: reveal)
     }
     
     func spawn_bubble() {
@@ -319,7 +330,7 @@ class GameScene: SKScene {
         } else {
             score += 1
         }
-        current_speed += 1
+        current_speed += 1 / 10
         
         if bubbling && self.score % 10 == 0 {
             self.spawn_bubble()
@@ -327,7 +338,7 @@ class GameScene: SKScene {
         
 //        if score % 200 == 0 { die() }
         
-        if Double.random(in: 0...1) < 0.02 { make_enemy(type: 1) }
+        if Double.random(in: 0...1) < 0.10 { make_enemy(type: 1) }
         
         for c in self.children {
             if c.name == "fish" {
